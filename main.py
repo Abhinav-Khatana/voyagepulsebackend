@@ -5,35 +5,32 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from docx import Document
 
+# Load environment variables
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_PATH = os.path.join(BASE_DIR, ".env")
 load_dotenv(ENV_PATH)
 
-
 def extract_text(file):
     """Extract text from txt or docx file"""
     filename = file.filename.lower()
-
     if filename.endswith(".txt"):
         return file.read().decode(errors="ignore")
-
     elif filename.endswith(".docx"):
         doc = Document(file)
         return "\n".join([p.text for p in doc.paragraphs])
-
     else:
         return file.read().decode(errors="ignore")
-
 
 def extract_timings(text):
     """Find all timings in text like 10:00, 14:30, 18:00 etc"""
     pattern = r"\b(?:[01]?\d|2[0-3]):[0-5]\d\b"
     return re.findall(pattern, text)
 
-
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # ✅ CORS for all /api/* routes, handles OPTIONS preflight properly
+    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True, methods=["GET","POST","OPTIONS"])
 
     APP_NAME = os.getenv("APP_NAME", "VoyagePulse")
     APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
@@ -69,9 +66,7 @@ def create_app():
 
     return app
 
-
 app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
