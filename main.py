@@ -29,8 +29,14 @@ def extract_timings(text):
 def create_app():
     app = Flask(__name__)
 
-    # ✅ CORS for all /api/* routes, handles OPTIONS preflight properly
-    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True, methods=["GET","POST","OPTIONS"])
+    # ✅ Proper CORS setup for Azure frontend
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": "*"}},
+        methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization"],
+        supports_credentials=True
+    )
 
     APP_NAME = os.getenv("APP_NAME", "VoyagePulse")
     APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
